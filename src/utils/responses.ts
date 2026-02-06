@@ -1,5 +1,5 @@
 export class SuccessResponse<T> {
-    success: {
+    public success: {
         message: string;
         data?: T;
     };
@@ -13,7 +13,7 @@ export class SuccessResponse<T> {
 }
 
 export class ErrorResponse {
-    error: {
+    public error: {
         code: string;
         message: string;
         details: unknown[];

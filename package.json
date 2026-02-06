@@ -1,0 +1,29 @@
+{
+    "name": "yoliday-assignment",
+    "version": "1.0.0",
+    "description": "Backend APIs for Experiences Marketplace",
+    "main": "dist/index.js",
+    "scripts": {
+        "start": "tsc && node dist/index.js",
+        "build": "tsc",
+        "start:dev": "nodemon",
+        "format": "prettier --write .",
+        "lint": "eslint . --ext .ts",
+        "lint:fix": "eslint . --ext .ts --fix"
+    },
+    "author": "Shivam Kumar",
+    "license": "ISC",
+    "packageManager": "pnpm@10.28.0",
+    "dependencies": {
+        "express": "^5.2.1"
+    },
+    "devDependencies": {
+        "@types/express": "^5.0.6",
+        "@types/node": "^25.2.1",
+        "eslint": "^9.39.2",
+        "nodemon": "^3.1.11",
+        "prettier": "^3.8.1",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.9.3"
+    }
+}

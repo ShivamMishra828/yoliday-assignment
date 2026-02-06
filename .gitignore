@@ -140,3 +140,4 @@ dist
 
 # Intellij
 .idea/
+/src/generated/prisma

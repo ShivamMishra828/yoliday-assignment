@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  admin
+  host
+  user
+}
+
+enum ExperienceStatus {
+  draft
+  published
+  blocker
+}
+
+enum BookingStatus {
+  confirmed
+  cancelled
+}
+
+model User {
+  id           String       @id @default(uuid())
+  email        String       @unique
+  passwordHash String       @map("password_hash")
+  role         Role
+  createdAt    DateTime     @default(now()) @map("created_at")
+  experiences  Experience[]
+  bookings     Booking[]
+
+  @@map("users")
+}
+
+model Experience {
+  id          String           @id @default(uuid())
+  title       String
+  description String
+  location    String
+  price       Int
+  startTime   DateTime         @map("start_time")
+  status      ExperienceStatus @default(draft)
+  createdAt   DateTime         @default(now()) @map("created_at")
+  createdBy   String           @map("created_by")
+  creator     User             @relation(fields: [createdBy], references: [id])
+  bookings    Booking[]
+
+  @@index([location, startTime])
+  @@index([createdBy])
+  @@map("experiences")
+}
+
+model Booking {
+  id           String        @id @default(uuid())
+  seats        Int
+  status       BookingStatus @default(confirmed)
+  createdAt    DateTime      @default(now()) @map("created_at")
+  experienceId String        @map("experience_id")
+  userId       String        @map("user_id")
+  experience   Experience    @relation(fields: [experienceId], references: [id])
+  user         User          @relation(fields: [userId], references: [id])
+
+  @@unique([userId, experienceId, status])
+  @@index([userId, experienceId])
+  @@map("bookings")
+}

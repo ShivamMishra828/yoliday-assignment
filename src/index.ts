@@ -2,6 +2,7 @@ import http from 'http';
 import serverConfig from './config/server-config';
 import app from './app';
 import logger from './config/logger-config';
+import prisma from './config/prisma-client';
 
 let server: http.Server | null = null;
 
@@ -9,6 +10,14 @@ const port: number = serverConfig.PORT;
 const env = serverConfig.NODE_ENV;
 
 async function startServer(): Promise<void> {
+    try {
+        await prisma.$connect();
+        logger.info('[SERVER] Prisma client successfully connected to the database.');
+    } catch (err: unknown) {
+        logger.fatal({ err }, '[SERVER] Failed to connect to database. Shutting down');
+        process.exit(1);
+    }
+
     server = http.createServer(app);
 
     server.on('error', (err: Error): void => {
@@ -22,7 +31,14 @@ async function startServer(): Promise<void> {
 }
 
 async function stopServer(signal?: string): Promise<void> {
-    logger.info(`[SERVER] Shutdown initiated. Signal: ${signal ?? 'unknown'}`);
+    logger.info({ signal: signal ?? 'unknown' }, '[SERVER] Shutdown initiated');
+
+    try {
+        await prisma.$disconnect();
+        logger.info('[SERVER] Database connection closed');
+    } catch (err: unknown) {
+        logger.error({ err }, '[SERVER] Error while disconnecting database');
+    }
 
     if (!server) {
         logger.warn('[SERVER] Shutdown requested before initialization');

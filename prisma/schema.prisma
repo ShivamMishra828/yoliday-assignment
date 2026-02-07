@@ -15,7 +15,7 @@ enum Role {
 enum ExperienceStatus {
   draft
   published
-  blocker
+  blocked
 }
 
 enum BookingStatus {

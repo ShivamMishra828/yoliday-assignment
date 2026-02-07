@@ -40,3 +40,13 @@ export async function signIn(req: Request, res: Response, next: NextFunction): P
         next(err);
     }
 }
+
+export async function signOut(_req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+        res.clearCookie('token')
+            .status(StatusCodes.OK)
+            .json(new SuccessResponse('User successfully logged out', null));
+    } catch (error) {
+        next(error);
+    }
+}

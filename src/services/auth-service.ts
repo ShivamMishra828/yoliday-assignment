@@ -2,12 +2,23 @@ import AuthRepository from '../repositories/auth-repository';
 import AppError from '../utils/app-error';
 import logger from '../config/logger-config';
 import { StatusCodes } from 'http-status-codes';
-import { hashPassword } from '../utils/helper';
+import { comparePassword, hashPassword, generateToken } from '../utils/helper';
+import { User } from '@prisma/client';
 
-interface UserInput {
+interface UserSignUpInput {
     email: string;
     password: string;
     role: 'host' | 'user';
+}
+
+interface UserSignInInput {
+    email: string;
+    password: string;
+}
+
+interface UserSignInOutput {
+    user: Omit<User, 'passwordHash'>;
+    token: string;
 }
 
 class AuthService {
@@ -17,7 +28,7 @@ class AuthService {
         this.authRepository = authRepository;
     }
 
-    async signup(userData: UserInput) {
+    async signup(userData: UserSignUpInput) {
         try {
             const existingUser = await this.authRepository.findByEmail(userData.email);
 
@@ -48,7 +59,51 @@ class AuthService {
             } else {
                 logger.error({ err }, '[AUTH_SERVICE] Unexpected error during signup');
                 throw new AppError(
-                    'An unexpected server error occurred during signup.',
+                    'An unexpected server error occurred during signup',
+                    StatusCodes.INTERNAL_SERVER_ERROR,
+                    'INTERNAL_SERVER_ERROR',
+                );
+            }
+        }
+    }
+
+    async signin(userData: UserSignInInput): Promise<UserSignInOutput> {
+        try {
+            const user = await this.authRepository.findByEmail(userData.email);
+
+            if (!user) {
+                throw new AppError(
+                    'User with this email does not exist',
+                    StatusCodes.NOT_FOUND,
+                    'USER_NOT_FOUND',
+                );
+            }
+
+            const isPasswordValid: boolean = await comparePassword(
+                userData.password,
+                user.passwordHash,
+            );
+
+            if (!isPasswordValid) {
+                throw new AppError(
+                    'Invalid credentials. Please check your email and password',
+                    StatusCodes.UNAUTHORIZED,
+                    'INVALID_CREDENTIALS',
+                );
+            }
+
+            const token: string = generateToken(user.id, user.role);
+
+            const { passwordHash: _, ...userWithoutPassword } = user;
+
+            return { user: userWithoutPassword, token };
+        } catch (err: unknown) {
+            if (err instanceof AppError) {
+                throw err;
+            } else {
+                logger.error({ err }, '[AUTH_SERVICE] Unexpected error during signin');
+                throw new AppError(
+                    'An unexpected server error occurred during signin',
                     StatusCodes.INTERNAL_SERVER_ERROR,
                     'INTERNAL_SERVER_ERROR',
                 );

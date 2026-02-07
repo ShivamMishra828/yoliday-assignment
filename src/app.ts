@@ -6,6 +6,8 @@ import { globalRateLimiter } from './utils/rate-limiter';
 import { StatusCodes } from 'http-status-codes';
 import cookieParser from 'cookie-parser';
 import prisma from './config/prisma-client';
+import globalErrorHandler from './middlewares/global-error-handler';
+import apiRoutes from './routes';
 
 const app: Express = express();
 
@@ -54,5 +56,9 @@ app.get('/health', async (_req: Request, res: Response): Promise<void> => {
 });
 
 app.use(globalRateLimiter);
+
+app.use('/api', apiRoutes);
+
+app.use(globalErrorHandler);
 
 export default app;

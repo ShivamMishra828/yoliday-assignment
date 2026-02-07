@@ -44,7 +44,6 @@ class AuthService {
             return userWithoutPassword;
         } catch (err: unknown) {
             if (err instanceof AppError) {
-                logger.warn({ err }, '[AUTH_SERVICE] SignUp validation failed');
                 throw err;
             } else {
                 logger.error({ err }, '[AUTH_SERVICE] Unexpected error during signup');

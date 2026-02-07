@@ -1,0 +1,10 @@
+import express, { Router } from 'express';
+import { signUp } from '../../controllers/auth-controller';
+import validate from '../../middlewares/validate-middleware';
+import { userSignupSchema } from '../../schemas/auth-schema';
+
+const router: Router = express.Router();
+
+router.post('/signup', validate(userSignupSchema), signUp);
+
+export default router;

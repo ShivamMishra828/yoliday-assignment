@@ -13,6 +13,14 @@ class ExperienceRepository {
     updateStatus(id: string, status: ExperienceStatus): Promise<Experience> {
         return prisma.experience.update({ where: { id }, data: { status } });
     }
+
+    findAll(): Promise<Experience[]> {
+        return prisma.experience.findMany({
+            where: {
+                status: 'published',
+            },
+        });
+    }
 }
 
 export default ExperienceRepository;

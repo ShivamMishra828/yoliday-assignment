@@ -65,3 +65,19 @@ export async function blockExperience(
         next(err);
     }
 }
+
+export async function findAllExperience(
+    _req: Request,
+    res: Response,
+    next: NextFunction,
+): Promise<void> {
+    try {
+        const experiences = await experienceService.findAllExperience();
+
+        res.status(StatusCodes.OK).json(
+            new SuccessResponse('Fetched all experiences successfully', experiences),
+        );
+    } catch (err: unknown) {
+        next(err);
+    }
+}

@@ -1,5 +1,5 @@
 import ExperienceRepository from '../repositories/experience-repository';
-import { Experience, ExperienceStatus, Role } from '@prisma/client';
+import { Experience, Role } from '@prisma/client';
 import AppError from '../utils/app-error';
 import { StatusCodes } from 'http-status-codes';
 
@@ -127,6 +127,18 @@ class ExperienceService {
                     'EXPERIENCE_UPDATE_FAILED',
                 );
             }
+        }
+    }
+
+    async findAllExperience(): Promise<Experience[]> {
+        try {
+            return await this.experienceRepository.findAll();
+        } catch (err: unknown) {
+            throw new AppError(
+                'Failed to find experiences',
+                StatusCodes.INTERNAL_SERVER_ERROR,
+                'INTERNAL_SERVER_ERROR',
+            );
         }
     }
 }

@@ -4,6 +4,7 @@ import requireRoles from '../../middlewares/role-middleware';
 import {
     blockExperience,
     createExperience,
+    findAllExperience,
     publishExperience,
 } from '../../controllers/experience-controller';
 import validate from '../../middlewares/validate-middleware';
@@ -34,5 +35,7 @@ router.patch(
     requireRoles(['admin']),
     blockExperience,
 );
+
+router.get('/', findAllExperience);
 
 export default router;

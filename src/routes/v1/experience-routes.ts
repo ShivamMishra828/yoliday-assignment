@@ -13,6 +13,8 @@ import {
     experienceIdParamSchema,
     listExperiencesQuerySchema,
 } from '../../schemas/experience-schema';
+import { bookExperienceBodySchema } from '../../schemas/booking-schema';
+import { bookExperience } from '../../controllers/booking-controller';
 
 const router: Router = express.Router();
 
@@ -41,5 +43,13 @@ router.patch(
 );
 
 router.get('/', validate(listExperiencesQuerySchema, 'query'), findAllExperience);
+
+router.post(
+    '/:id/book',
+    verifyJwtToken,
+    validate(experienceIdParamSchema, 'params'),
+    validate(bookExperienceBodySchema),
+    bookExperience,
+);
 
 export default router;

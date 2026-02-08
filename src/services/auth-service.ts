@@ -1,6 +1,5 @@
 import AuthRepository from '../repositories/auth-repository';
 import AppError from '../utils/app-error';
-import logger from '../config/logger-config';
 import { StatusCodes } from 'http-status-codes';
 import { comparePassword, hashPassword, generateToken } from '../utils/helper';
 import { User } from '@prisma/client';
@@ -28,7 +27,7 @@ class AuthService {
         this.authRepository = authRepository;
     }
 
-    async signup(userData: UserSignUpInput) {
+    async signup(userData: UserSignUpInput): Promise<Omit<User, 'passwordHash'>> {
         try {
             const existingUser = await this.authRepository.findByEmail(userData.email);
 
@@ -57,7 +56,6 @@ class AuthService {
             if (err instanceof AppError) {
                 throw err;
             } else {
-                logger.error({ err }, '[AUTH_SERVICE] Unexpected error during signup');
                 throw new AppError(
                     'An unexpected server error occurred during signup',
                     StatusCodes.INTERNAL_SERVER_ERROR,
@@ -101,7 +99,6 @@ class AuthService {
             if (err instanceof AppError) {
                 throw err;
             } else {
-                logger.error({ err }, '[AUTH_SERVICE] Unexpected error during signin');
                 throw new AppError(
                     'An unexpected server error occurred during signin',
                     StatusCodes.INTERNAL_SERVER_ERROR,

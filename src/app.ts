@@ -8,6 +8,7 @@ import cookieParser from 'cookie-parser';
 import prisma from './config/prisma-client';
 import globalErrorHandler from './middlewares/global-error-handler';
 import apiRoutes from './routes';
+import requestLogger from './middlewares/request-logger-middleware';
 
 const app: Express = express();
 
@@ -22,6 +23,7 @@ const origins =
 
 app.use(helmet());
 app.use(cookieParser());
+app.use(requestLogger);
 
 app.use(
     cors({

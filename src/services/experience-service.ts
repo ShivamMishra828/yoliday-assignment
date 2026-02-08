@@ -1,5 +1,5 @@
 import ExperienceRepository from '../repositories/experience-repository';
-import { Experience, Role } from '@prisma/client';
+import { Experience, Prisma, Role } from '@prisma/client';
 import AppError from '../utils/app-error';
 import { StatusCodes } from 'http-status-codes';
 
@@ -130,9 +130,24 @@ class ExperienceService {
         }
     }
 
-    async findAllExperience(): Promise<Experience[]> {
+    async findAllExperience(query: {
+        location?: string;
+        sort: 'asc' | 'desc';
+    }): Promise<Experience[]> {
         try {
-            return await this.experienceRepository.findAll();
+            const filters: Prisma.ExperienceWhereInput = {};
+
+            if (query.location) {
+                filters.location = {
+                    contains: query.location,
+                    mode: 'insensitive',
+                };
+            }
+            return await this.experienceRepository.findAll(filters, {
+                orderBy: {
+                    startTime: query.sort,
+                },
+            });
         } catch (err: unknown) {
             throw new AppError(
                 'Failed to find experiences',

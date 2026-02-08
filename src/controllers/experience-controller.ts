@@ -67,12 +67,12 @@ export async function blockExperience(
 }
 
 export async function findAllExperience(
-    _req: Request,
+    req: Request,
     res: Response,
     next: NextFunction,
 ): Promise<void> {
     try {
-        const experiences = await experienceService.findAllExperience();
+        const experiences = await experienceService.findAllExperience(req.query as any);
 
         res.status(StatusCodes.OK).json(
             new SuccessResponse('Fetched all experiences successfully', experiences),

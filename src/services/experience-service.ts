@@ -39,15 +39,13 @@ class ExperienceService {
         }
     }
 
-    async updateStatus(
+    async publishExperience(
         userId: string,
         experienceId: string,
-        targetStatus: ExperienceStatus,
         userRole: Role,
     ): Promise<Experience> {
         try {
             const experience = await this.experienceRepository.findById(experienceId);
-
             if (!experience) {
                 throw new AppError(
                     'Experience not found',
@@ -56,43 +54,75 @@ class ExperienceService {
                 );
             }
 
-            if (experience.status === targetStatus) {
+            if (experience.status === 'published') {
                 throw new AppError(
-                    `Experience is already ${targetStatus}`,
+                    'Experience is already published',
                     StatusCodes.CONFLICT,
-                    `EXPERIENCE_ALREADY_${targetStatus.toUpperCase()}`,
+                    'EXPERIENCE_ALREADY_PUBLISHED',
                 );
             }
 
-            const isAdmin = userRole === 'admin';
-            const isOwner = experience.createdBy === userId;
+            const isAdmin: boolean = userRole === 'admin';
+            const isOwner: boolean = experience.createdBy === userId;
 
-            if (targetStatus === ExperienceStatus.published) {
-                if (!isAdmin && !isOwner) {
-                    throw new AppError(
-                        'You do not have permission to publish this experience',
-                        StatusCodes.FORBIDDEN,
-                        'FORBIDDEN',
-                    );
-                }
+            if (!isAdmin && !isOwner) {
+                throw new AppError(
+                    'You do not have permission to publish this experience',
+                    StatusCodes.FORBIDDEN,
+                    'FORBIDDEN',
+                );
             }
 
-            if (targetStatus === ExperienceStatus.blocked) {
-                if (!isAdmin) {
-                    throw new AppError(
-                        'Only admins can block experiences',
-                        StatusCodes.FORBIDDEN,
-                        'FORBIDDEN',
-                    );
-                }
-            }
-            return this.experienceRepository.updateStatus(experienceId, targetStatus);
+            return this.experienceRepository.updateStatus(experienceId, 'published');
         } catch (err) {
             if (err instanceof AppError) {
                 throw err;
             } else {
                 throw new AppError(
-                    'Failed to update experience',
+                    'Failed to publish experience',
+                    StatusCodes.INTERNAL_SERVER_ERROR,
+                    'EXPERIENCE_UPDATE_FAILED',
+                );
+            }
+        }
+    }
+
+    async blockExperience(experienceId: string, userRole: Role): Promise<Experience> {
+        try {
+            const experience = await this.experienceRepository.findById(experienceId);
+            if (!experience) {
+                throw new AppError(
+                    'Experience not found',
+                    StatusCodes.NOT_FOUND,
+                    'EXPERIENCE_NOT_FOUND',
+                );
+            }
+
+            if (experience.status === 'blocked') {
+                throw new AppError(
+                    'Experience is already blocked',
+                    StatusCodes.CONFLICT,
+                    'EXPERIENCE_ALREADY_BLOCKED',
+                );
+            }
+
+            const isAdmin: boolean = userRole === 'admin';
+
+            if (!isAdmin) {
+                throw new AppError(
+                    'Only admins can block experiences',
+                    StatusCodes.FORBIDDEN,
+                    'FORBIDDEN',
+                );
+            }
+
+            return this.experienceRepository.updateStatus(experienceId, 'blocked');
+        } catch (err) {
+            if (err instanceof AppError) {
+                throw err;
+            } else {
+                throw new AppError(
+                    'Failed to block experience',
                     StatusCodes.INTERNAL_SERVER_ERROR,
                     'EXPERIENCE_UPDATE_FAILED',
                 );

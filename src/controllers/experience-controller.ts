@@ -23,7 +23,7 @@ export async function createExperience(
     }
 }
 
-export async function updateExperienceStatus(
+export async function publishExperience(
     req: Request,
     res: Response,
     next: NextFunction,
@@ -31,18 +31,35 @@ export async function updateExperienceStatus(
     try {
         const experienceId = req.params.id as string;
         const userId = req.user!.id;
-        const targetStatus = req.body.status;
         const userRole = req.user!.role;
 
-        const experience = await experienceService.updateStatus(
+        const experience = await experienceService.publishExperience(
             userId,
             experienceId,
-            targetStatus,
             userRole,
         );
 
         res.status(StatusCodes.OK).json(
-            new SuccessResponse(`Experience ${targetStatus} successfully`, experience),
+            new SuccessResponse('Experience published successfully', experience),
+        );
+    } catch (err: unknown) {
+        next(err);
+    }
+}
+
+export async function blockExperience(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+): Promise<void> {
+    try {
+        const experienceId = req.params.id as string;
+        const userRole = req.user!.role;
+
+        const experience = await experienceService.blockExperience(experienceId, userRole);
+
+        res.status(StatusCodes.OK).json(
+            new SuccessResponse('Experience blocked successfully', experience),
         );
     } catch (err: unknown) {
         next(err);

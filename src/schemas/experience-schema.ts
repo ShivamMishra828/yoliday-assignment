@@ -9,10 +9,6 @@ export const createExperienceSchema = z.object({
     startTime: z.string().datetime({ message: 'Invalid start time format' }),
 });
 
-export const updateExperienceStatusSchema = z.object({
-    status: z.nativeEnum(ExperienceStatus),
-});
-
 export const experienceIdParamSchema = z.object({
     id: z.string().uuid('Invalid experience id'),
 });

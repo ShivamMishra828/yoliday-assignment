@@ -1,13 +1,13 @@
 import express, { Router } from 'express';
 import verifyJwtToken from '../../middlewares/auth-middleware';
 import requireRoles from '../../middlewares/role-middleware';
-import { createExperience, updateExperienceStatus } from '../../controllers/experience-controller';
-import validate from '../../middlewares/validate-middleware';
 import {
-    createExperienceSchema,
-    experienceIdParamSchema,
-    updateExperienceStatusSchema,
-} from '../../schemas/experience-schema';
+    blockExperience,
+    createExperience,
+    publishExperience,
+} from '../../controllers/experience-controller';
+import validate from '../../middlewares/validate-middleware';
+import { createExperienceSchema, experienceIdParamSchema } from '../../schemas/experience-schema';
 
 const router: Router = express.Router();
 
@@ -20,12 +20,19 @@ router.post(
 );
 
 router.patch(
-    '/:id/status',
+    '/:id/publish',
     validate(experienceIdParamSchema, 'params'),
-    validate(updateExperienceStatusSchema, 'body'),
     verifyJwtToken,
     requireRoles(['host', 'admin']),
-    updateExperienceStatus,
+    publishExperience,
+);
+
+router.patch(
+    '/:id/block',
+    validate(experienceIdParamSchema, 'params'),
+    verifyJwtToken,
+    requireRoles(['admin']),
+    blockExperience,
 );
 
 export default router;

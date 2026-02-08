@@ -132,6 +132,8 @@ class ExperienceService {
 
     async findAllExperience(query: {
         location?: string;
+        from?: string;
+        to?: string;
         sort: 'asc' | 'desc';
     }): Promise<Experience[]> {
         try {
@@ -143,6 +145,17 @@ class ExperienceService {
                     mode: 'insensitive',
                 };
             }
+
+            if (query.from || query.to) {
+                filters.startTime = {};
+                if (query.from) {
+                    filters.startTime.gte = new Date(`${query.from}T00:00:00.000Z`);
+                }
+                if (query.to) {
+                    filters.startTime.lte = new Date(`${query.to}T23:59:59.999Z`);
+                }
+            }
+
             return await this.experienceRepository.findAll(filters, {
                 orderBy: {
                     startTime: query.sort,

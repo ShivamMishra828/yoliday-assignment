@@ -72,7 +72,18 @@ export async function findAllExperience(
     next: NextFunction,
 ): Promise<void> {
     try {
-        const experiences = await experienceService.findAllExperience(req.query as any);
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.limit) || 10;
+        const sort = (req.query.sort as 'asc' | 'desc') || 'asc';
+
+        const experiences = await experienceService.findAllExperience({
+            location: req.query.location as string | undefined,
+            from: req.query.from as string | undefined,
+            to: req.query.to as string | undefined,
+            page: page,
+            limit: limit,
+            sort: sort,
+        });
 
         res.status(StatusCodes.OK).json(
             new SuccessResponse('Fetched all experiences successfully', experiences),

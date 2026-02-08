@@ -8,7 +8,11 @@ import {
     publishExperience,
 } from '../../controllers/experience-controller';
 import validate from '../../middlewares/validate-middleware';
-import { createExperienceSchema, experienceIdParamSchema } from '../../schemas/experience-schema';
+import {
+    createExperienceSchema,
+    experienceIdParamSchema,
+    listExperiencesQuerySchema,
+} from '../../schemas/experience-schema';
 
 const router: Router = express.Router();
 
@@ -36,6 +40,6 @@ router.patch(
     blockExperience,
 );
 
-router.get('/', findAllExperience);
+router.get('/', validate(listExperiencesQuerySchema, 'query'), findAllExperience);
 
 export default router;

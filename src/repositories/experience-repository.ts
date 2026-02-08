@@ -17,14 +17,18 @@ class ExperienceRepository {
     findAll(
         filters: Prisma.ExperienceWhereInput,
         options: {
+            skip: number;
+            take: number;
             orderBy: Prisma.ExperienceOrderByWithRelationInput;
         },
     ): Promise<Experience[]> {
         return prisma.experience.findMany({
             where: {
-                status: 'published',
+                status: ExperienceStatus.published,
                 ...filters,
             },
+            skip: options.skip,
+            take: options.take,
             orderBy: options.orderBy,
         });
     }

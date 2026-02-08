@@ -134,6 +134,8 @@ class ExperienceService {
         location?: string;
         from?: string;
         to?: string;
+        page: number;
+        limit: number;
         sort: 'asc' | 'desc';
     }): Promise<Experience[]> {
         try {
@@ -156,7 +158,11 @@ class ExperienceService {
                 }
             }
 
+            const skip: number = (query.page - 1) * query.limit;
+
             return await this.experienceRepository.findAll(filters, {
+                skip,
+                take: query.limit,
                 orderBy: {
                     startTime: query.sort,
                 },

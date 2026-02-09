@@ -84,7 +84,6 @@ src/
 ├── routes/         # API Route definitions
 ├── schemas/        # Zod validation schemas
 ├── services/       # Business logic
-├── scripts/        # Seeder scripts
 └── utils/          # Helper functions
 ```
 
